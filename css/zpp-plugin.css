@@ -1,0 +1,18 @@
+.zpp_product_price {
+	color: #CC0000;
+	font-family: Georgia,Times New Roman,serif;
+	font-size: 1.7em;
+	font-weight: bold;
+}
+
+.zpp_buy_now {
+	font-family: Georgia,Times New Roman,serif;
+	font-size: 1.7em;
+	font-weight: bold;
+}
+
+.zpp_cover {
+        padding: 10px;
+        margin: 0px auto;
+}
+
