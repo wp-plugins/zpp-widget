@@ -13,8 +13,8 @@ Złote Myśli.
 Dzięki tej wtyczce zautomatyzujesz zarabianie na swoim blogu!
 
 Jeśli jeszcze nie jesteś Partnerem wydawnictwa Złote Myśli, to wejdź na stronę
-[Programu Partnerskiego](http://pp.zlotemysli.pl/ "Złoty Program Partnerski) i zobacz ile możesz zyskać. Program partnerski oferuje łatwą i szybką możliwość
-zarobku dzięki promowaniu produktów wydawnictwa [Złote Myśli](http://www.zlotemysli.pl/ "Dobre książki, ebooki, audiobooki - rozwój osobisty, motywacja i samodoskonalenie).
+[Programu Partnerskiego](http://pp.zlotemysli.pl/ "Złoty Program Partnerski") i zobacz ile możesz zyskać. Program partnerski oferuje łatwą i szybką możliwość
+zarobku dzięki promowaniu produktów wydawnictwa [Złote Myśli](http://www.zlotemysli.pl/ "Dobre książki, ebooki, audiobooki - rozwój osobisty, motywacja i samodoskonalenie").
 
 ZPP Widget wyświetla losową okładkę z kategorii wybranych przez Ciebie.
 Jeśli odwiedzający kliknie w nią, a następnie kupi produkt na stronach
