@@ -44,6 +44,9 @@ Trzecią opcją jest wgranie folderu z wtyczką przez FTP do katalogu `/wp-conte
 
 == Changelog ==
 
+= 0.61 =
+* sprawdzanie poprawności linka partnerskiego
+
 = 0.60 =
 * poprawki błędów
 * pierwsza wersja publiczna

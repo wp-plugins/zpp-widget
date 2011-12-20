@@ -4,7 +4,7 @@
 	Plugin URI: http://pp.zlotemysli.pl/widget
 	Description: Widget losujący okładki dla Złotego Programu Partnerskiego - http://pp.zlotemysli.pl/
 	Author: Marcin Kądziołka
-	Version: 0.60
+	Version: 0.61
 	Author URI: http://marcin.kadziolka.net/
 	License: GPL2
 
@@ -29,7 +29,7 @@
 
 define("ZPP_DEBUG", false);
 
-$zpp_widget_version = '0.60';
+$zpp_widget_version = '0.61';
 
 /* Add our function to the widgets_init hook. */
 add_action( 'widgets_init', 'zpp_load_widget' );
@@ -45,12 +45,16 @@ function zpp_load_widget() {
 	register_widget( 'Zpp_Widget' );
 }
 
-function zpp_is_addon_installed($addon) {
+function zpp_is_addon_installed( $addon ) {
 	if(in_array($addon, get_loaded_extensions())) {
 		return true;
 	} else {
 		return false;
 	}
+}
+
+function zpp_partnerlink_valid( $partnerlink ) {
+	return ctype_alnum( $partnerlink );
 }
 
 class Zpp_Widget extends WP_Widget {
@@ -505,9 +509,16 @@ function zppwidget_plugin_options() {
 	$data_saved = false;
 
 	if( isset( $_POST[$hidden_partnerlink_name] ) && $_POST[ $hidden_partnerlink_name ] == 'Y' ) {
-		update_option( $partnerlink_opt_name, $_POST['partnerlink'] );
-		$partnerlink_opt_val = $_POST['partnerlink'];
-		$data_saved = true;
+
+		if( zpp_partnerlink_valid( $_POST['partnerlink'] ) ) {
+			update_option( $partnerlink_opt_name, $_POST['partnerlink'] );
+			$partnerlink_opt_val = $_POST['partnerlink'];
+			$data_saved = true;
+		} else {
+?>
+<div class="error"><p><strong>Uwaga! Podałeś link partnerski, który nie jest poprawny w Złotym Programie Partnerskim. Link partnerski składa się tylko z liter i cyfr, np. mojlink, polecam, ala123.</strong></p></div>
+<?php
+		}
 	}
 
 
