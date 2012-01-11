@@ -44,6 +44,9 @@ Trzecią opcją jest wgranie folderu z wtyczką przez FTP do katalogu `/wp-conte
 
 == Changelog ==
 
+= 0.62 =
+* wyłączenie z losowania produktów specjalnych
+
 = 0.61 =
 * sprawdzanie poprawności linka partnerskiego
 

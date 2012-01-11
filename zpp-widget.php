@@ -4,7 +4,7 @@
 	Plugin URI: http://pp.zlotemysli.pl/widget
 	Description: Widget losujący okładki dla Złotego Programu Partnerskiego - http://pp.zlotemysli.pl/
 	Author: Marcin Kądziołka
-	Version: 0.61
+	Version: 0.62
 	Author URI: http://marcin.kadziolka.net/
 	License: GPL2
 
@@ -29,7 +29,7 @@
 
 define("ZPP_DEBUG", false);
 
-$zpp_widget_version = '0.61';
+$zpp_widget_version = '0.62';
 
 /* Add our function to the widgets_init hook. */
 add_action( 'widgets_init', 'zpp_load_widget' );
@@ -355,7 +355,17 @@ class Zpp_Widget extends WP_Widget {
 			$offers = $loaded_xml->Body->loadOffers->offers;
 
 			foreach( $offers->offer as $offer ) {
-				$ret_arr[] = (int) $offer->id;
+				foreach( $offer->attributes->attribute as $attr ) {
+					if( !strcmp( $attr->name, 'zm:productTypeId' ) ) {
+						if( $attr->value < 32 ) {
+							$ret_arr[] = (int) $offer->id;
+						}
+
+						break;
+					}
+				}
+
+
 			}
 		} else {
 			return null;
