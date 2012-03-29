@@ -4,7 +4,7 @@
 	Plugin URI: http://pp.zlotemysli.pl/widget
 	Description: Widget losujący okładki dla Złotego Programu Partnerskiego - http://pp.zlotemysli.pl/
 	Author: Marcin Kądziołka
-	Version: 0.62
+	Version: 0.63
 	Author URI: http://marcin.kadziolka.net/
 	License: GPL2
 
@@ -29,7 +29,7 @@
 
 define("ZPP_DEBUG", false);
 
-$zpp_widget_version = '0.62';
+$zpp_widget_version = '0.63';
 
 /* Add our function to the widgets_init hook. */
 add_action( 'widgets_init', 'zpp_load_widget' );
@@ -79,6 +79,7 @@ class Zpp_Widget extends WP_Widget {
 		$visible_author = $instance['visible_author'];
 		$visible_buy_button = $instance['visible_buy_button'];
 		$visible_price = $instance['visible_price'];
+		$only_free_products = $instance['only_free_products'];
 		$campaign = 'zppwidget';
 		$partnerlink = get_option( 'zpp_partnerlink' );
 		$id_categories = get_option( 'zpp_categories' );
@@ -89,7 +90,7 @@ class Zpp_Widget extends WP_Widget {
 
 		foreach( explode( ',', $id_categories ) as $id ) {
 			if( $id != 0 ) {
-				$ret_arr = Zpp_Widget::get_ids_for_category($id);
+				$ret_arr = Zpp_Widget::get_ids_for_category($id, $only_free_products);
 
 				if( is_array($ret_arr) ) {
 					$id_products_from_categories = array_merge( $id_products_from_categories, $ret_arr );
@@ -148,8 +149,14 @@ class Zpp_Widget extends WP_Widget {
 		if( $visible_author )
 			echo '<div class="zpp_product_author">' . $product_author . '</div>' . "\n";
 
-		if( $visible_price )
-			echo '<div class="zpp_product_price">' . $product_price . '</div>' . "\n";
+		if( $visible_price ) {
+			if( $product_price == 0 ) {
+				echo '<div class="zpp_product_price">DARMOWY</div>' . "\n";
+			}
+			else {
+				echo '<div class="zpp_product_price">' . $product_price . '</div>' . "\n";
+			}
+		}
 
 		if( $visible_buy_button )
 			echo '<div class="zpp_buy_now"><a href="' . $add_basket_url . '" alt="kup ebook ' . $product_name . '" target="_blank">KUP TERAZ</a></div>' . "\n";
@@ -346,7 +353,7 @@ class Zpp_Widget extends WP_Widget {
 	}
 
 
-	public static function get_ids_for_category( $id_category) {
+	public static function get_ids_for_category( $id_category, $only_free=false ) {
 		$url = "http://export.zlotemysli.pl/feeds/zppwidget.xml?category_id=" . $id_category;
 		$loaded_xml = Zpp_Widget::get_xml( $url );
 
@@ -358,7 +365,12 @@ class Zpp_Widget extends WP_Widget {
 				foreach( $offer->attributes->attribute as $attr ) {
 					if( !strcmp( $attr->name, 'zm:productTypeId' ) ) {
 						if( $attr->value < 32 ) {
-							$ret_arr[] = (int) $offer->id;
+							if( !$only_free ) { 
+								$ret_arr[] = (int) $offer->id;
+							}
+							elseif ($offer->price == 0) {
+								$ret_arr[] = (int) $offer->id;
+							}
 						}
 
 						break;
@@ -401,6 +413,7 @@ class Zpp_Widget extends WP_Widget {
 		$instance['visible_author'] = strip_tags( $new_instance['visible_author'] );
 		$instance['visible_buy_button'] = strip_tags( $new_instance['visible_buy_button'] );
 		$instance['visible_price'] = strip_tags( $new_instance['visible_price'] );
+		$instance['only_free_products'] = strip_tags( $new_instance['only_free_products'] );
 
 		return $instance;
 	}
@@ -437,6 +450,10 @@ class Zpp_Widget extends WP_Widget {
 			<br/>
 			<input type="checkbox" id="<?php echo $this->get_field_id( 'visible_buy_button' ); ?>" name="<?php echo $this->get_field_name( 'visible_buy_button' ); ?>" <?php if($instance['visible_buy_button']) echo $checked; ?> />
 			<label for="<?php echo $this->get_field_id( 'visible_buy_button' ); ?>">Wyświetlać przycisk "Dodaj do koszyka"?</label>
+			<br/>
+			<input type="checkbox" id="<?php echo $this->get_field_id( 'only_free_products' ); ?>" name="<?php echo $this->get_field_name( 'only_free_products' ); ?>" <?php if($instance['only_free_products']) echo $checked; ?> />
+			<label for="<?php echo $this->get_field_id( 'only_free_products' ); ?>">Wyświetlać tylko darmowe produkty</label>
+			
 		</p>
 <?php
 		$categories_opt_name = 'zpp_categories';

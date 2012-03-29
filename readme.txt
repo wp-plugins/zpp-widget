@@ -44,6 +44,10 @@ Trzecią opcją jest wgranie folderu z wtyczką przez FTP do katalogu `/wp-conte
 
 == Changelog ==
 
+= 0.63 =
+* możliwość ustawienia pokazywania tylko produktów darmowych
+* zmiana wyświetlania ceny 0.00 zł na DARMOWY
+
 = 0.62 =
 * wyłączenie z losowania produktów specjalnych
 
