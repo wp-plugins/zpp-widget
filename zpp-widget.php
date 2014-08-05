@@ -4,11 +4,11 @@
 	Plugin URI: http://pp.zlotemysli.pl/widget
 	Description: Widget losujący okładki dla Złotego Programu Partnerskiego - http://pp.zlotemysli.pl/
 	Author: Marcin Kądziołka
-	Version: 0.63
+	Version: 0.71
 	Author URI: http://marcin.kadziolka.net/
 	License: GPL2
 
-	Copyright 2011 Marcin Kądziołka (email : widget@zlotemysli.pl)
+	Copyright 2011-2014 Marcin Kądziołka (email : widget@zlotemysli.pl)
         Based on a Helion Widget by Paweł Pela - http://paulpela.com/
 
     This program is free software; you can redistribute it and/or modify
@@ -29,7 +29,7 @@
 
 define("ZPP_DEBUG", false);
 
-$zpp_widget_version = '0.63';
+$zpp_widget_version = '0.71';
 
 /* Add our function to the widgets_init hook. */
 add_action( 'widgets_init', 'zpp_load_widget' );
@@ -61,7 +61,7 @@ class Zpp_Widget extends WP_Widget {
 	
 	function Zpp_Widget() {
 		/* Widget settings. */
-		$widget_ops = array( 'classname' => 'zpp_widget', 'description' => 'Widget wyświetlający wybrane książki wydawnictwa Złote Myśli, zintegrowany z programem partnerskim', 'coversize' => '152x200' );
+		$widget_ops = array( 'classname' => 'zpp_widget', 'description' => 'Widget wyświetlający wybrane książki wydawnictwa Złote Myśli, zintegrowany z programem partnerskim', 'coversize' => '152x200', 'layout' => '1' );
 
 		/* Widget control settings. */
 		$control_ops = array( 'width' => 300, 'height' => 350, 'id_base' => 'zpp-widget' );
@@ -75,6 +75,7 @@ class Zpp_Widget extends WP_Widget {
 		
 		$title = apply_filters( 'widget_title', $instance['title'] );
 		$coversize = $instance['coversize'];
+		$layout = $instance['layout'];
 		$visible_title = $instance['visible_title'];
 		$visible_author = $instance['visible_author'];
 		$visible_buy_button = $instance['visible_buy_button'];
@@ -109,29 +110,22 @@ class Zpp_Widget extends WP_Widget {
 		if( sizeof( $ids_to_randomize ) == 0 )
 			return;
 
-		$rand_key = array_rand( $ids_to_randomize );
-		$id_product = $ids_to_randomize[$rand_key];
-		$product = $this->get_product( $id_product );
-		$img_url = preg_replace( '/\d\d\dx\d\d\d/', $coversize, $product->image );
-		$cached_img_url = $this->get_cover_from_cache( $img_url );
-
-		if( $cached_img_url == null ) {
-			$this->save_cover_to_cache( $img_url );
-		} else {
-			$img_url = $cached_img_url;
-		}
-
-		$product_url = str_replace( '/prod/', "/$partnerlink,$campaign/prod/", $product->url );
-		$add_basket_url = 'http://www.zlotemysli.pl/' . $partnerlink . ',' . $campaign . '/koszyk/dodaj-produkt/' . $id_product . '.html';
-		$product_name = htmlspecialchars( preg_replace( '/(.*)( - wersja.*)/i', '$1', $product->name ) );
-		$product_price = preg_replace( '/\./', ',', $product->price );
-		$product_price .= ' zł';
-
-		foreach( $product->attributes->attribute as $attr ) {
-			if( !strcmp($attr->name, 'Autor' ) ) {
-				$product_author = htmlspecialchars( $attr->value );
+		// how many are needed?
+		switch($layout) {
+			case '1':
+				$randnum = 1;
 				break;
-			}
+			case '2x1':
+			case '1x2':
+				$randnum = 2;
+				break;
+			case '2x2':
+			case '1x4':
+				$randnum = 4;
+				break;
+				
+			default:
+				$randnum = 1;
 		}
 
 		echo '<li id="zpp-widget" class="zpp_widget">' . "\n";
@@ -139,29 +133,66 @@ class Zpp_Widget extends WP_Widget {
 		if( $title )
 			echo $before_title . $title . $after_title . "\n";
 
-		echo '<div class="zpp_cover">' . "\n";
-		echo '<a href="' . $product_url . '" target="_blank" alt="strona książki ' . $product_name . '"><img src="' . $img_url . '" alt="książka ' . $product_name . '" title="okładka książki ' . $product_name . '"></a>' . "\n";
-		echo '</div>' . "\n";
-
-		if( $visible_title )
-			echo '<div class="zpp_product_title"><a href="' . $product_url . '" alt="ebook ' . $product_name . '" target="_blank">' . $product_name . '</a></div>' . "\n";
-
-		if( $visible_author )
-			echo '<div class="zpp_product_author">' . $product_author . '</div>' . "\n";
-
-		if( $visible_price ) {
-			if( $product_price == 0 ) {
-				echo '<div class="zpp_product_price">DARMOWY</div>' . "\n";
-			}
-			else {
-				echo '<div class="zpp_product_price">' . $product_price . '</div>' . "\n";
-			}
+		echo '<ul class="col' . $layout . '">' . "\n";
+		$random_keys = array_rand( $ids_to_randomize, $randnum );
+		
+		if( $randnum == 1 ) {
+			$random_keys = array( $random_keys );
 		}
 
-		if( $visible_buy_button )
-			echo '<div class="zpp_buy_now"><a href="' . $add_basket_url . '" alt="kup ebook ' . $product_name . '" target="_blank">KUP TERAZ</a></div>' . "\n";
+		foreach($random_keys as $rand_key) {
+			$id_product = $ids_to_randomize[$rand_key];
+			$product = $this->get_product( $id_product );
+			$img_url = preg_replace( '/\d\d\dx\d\d\d/', $coversize, $product->image );
+			$cached_img_url = $this->get_cover_from_cache( $img_url );
+	
+			if( $cached_img_url == null ) {
+				$this->save_cover_to_cache( $img_url );
+			} else {
+				$img_url = $cached_img_url;
+			}
+	
+			$product_url = str_replace( '/prod/', "/new,$partnerlink,$campaign/prod/", $product->url );
+			$add_basket_url = 'http://www.zlotemysli.pl/new,' . $partnerlink . ',' . $campaign . '/koszyk/dodaj-produkt/' . $id_product . '.html';
+			$product_name = htmlspecialchars( preg_replace( '/(.*)( - wersja.*)/i', '$1', $product->name ) );
+			$product_price = preg_replace( '/\./', ',', $product->price );
+			$product_price .= ' zł';
+	
+			foreach( $product->attributes->attribute as $attr ) {
+				if( !strcmp($attr->name, 'Autor' ) ) {
+					$product_author = htmlspecialchars( $attr->value );
+					break;
+				}
+			}
 
-		echo '</li>' . "\n";
+			echo '<li>';
+			echo '<div class="zpp_cover">' . "\n";
+			echo '<a href="' . $product_url . '" target="_blank" alt="strona książki ' . $product_name . '"><img src="' . $img_url . '" alt="książka ' . $product_name . '" title="okładka książki ' . $product_name . '"></a>' . "\n";
+			echo '</div>' . "\n";
+
+			if( $visible_title )
+				echo '<div class="zpp_product_title"><a href="' . $product_url . '" alt="ebook ' . $product_name . '" target="_blank">' . $product_name . '</a></div>' . "\n";
+
+			if( $visible_author )
+				echo '<div class="zpp_product_author">' . $product_author . '</div>' . "\n";
+
+			if( $visible_price ) {
+				if( $product_price == 0 ) {
+					echo '<div class="zpp_product_price">DARMOWY</div>' . "\n";
+				}
+				else {
+					echo '<div class="zpp_product_price">' . $product_price . '</div>' . "\n";
+				}
+			}
+	
+			if( $visible_buy_button )
+				echo '<div class="zpp_buy_now"><a href="' . $add_basket_url . '" alt="kup ebook ' . $product_name . '" target="_blank">KUP TERAZ</a></div>' . "\n";
+
+			echo "</li>\n";
+		}
+		
+		echo "\n</ul>";
+		echo "\n</li>\n";
 	}
 
 	function prepare_cover_filename( $url ) {
@@ -409,6 +440,7 @@ class Zpp_Widget extends WP_Widget {
 		/* Strip tags (if needed) and update the widget settings. */
 		$instance['title'] = strip_tags( $new_instance['title'] );
 		$instance['coversize'] = strip_tags( $new_instance['coversize'] );
+		$instance['layout'] = strip_tags( $new_instance['layout'] );
 		$instance['visible_title'] = strip_tags( $new_instance['visible_title'] );
 		$instance['visible_author'] = strip_tags( $new_instance['visible_author'] );
 		$instance['visible_buy_button'] = strip_tags( $new_instance['visible_buy_button'] );
@@ -437,6 +469,16 @@ class Zpp_Widget extends WP_Widget {
 				<option <?php if($instance['coversize'] == "82x122") echo $selected; ?>>82x122</option>
 				<option <?php if($instance['coversize'] == "152x200") echo $selected; ?>>152x200</option>
 			</select>
+		</p>
+		<p>
+		<label for="<?php echo $this->get_field_id( 'layout' ); ?>">Układ okładek:</label>
+		<select id="<?php echo $this->get_field_id( 'layout' ); ?>" name="<?php echo $this->get_field_name( 'layout' ); ?>" class="widefat" style="width:100%;">
+			<option <?php if($instance['layout'] == "1") echo $selected; ?> value="1">Jedna</option>
+			<option <?php if($instance['layout'] == "2x1") echo $selected; ?> value="2x1">Dwie poziomo</option>
+			<option <?php if($instance['layout'] == "1x2") echo $selected; ?> value="1x2">Dwie pionowo</option>
+			<option <?php if($instance['layout'] == "2x2") echo $selected; ?> value="2x2">Cztery w kwadracie</option>
+			<option <?php if($instance['layout'] == "1x4") echo $selected; ?> value="1x4">Cztery pionowo</option>
+		</select>
 		</p>
 		<p>
 			<input type="checkbox" id="<?php echo $this->get_field_id( 'visible_title' ); ?>" name="<?php echo $this->get_field_name( 'visible_title' ); ?>" <?php if($instance['visible_title']) echo $checked; ?> />

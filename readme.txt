@@ -2,7 +2,7 @@
 Contributors: kalma
 Tags: zpp, pp, program partnerski, złote myśli, zlote mysli, zarabianie
 Requires at least: 3.0.0
-Tested up to: 3.2.1
+Tested up to: 3.9.1
 Stable tag: trunk
 
 Widget losujący okładki dla Złotego Programu Partnerskiego wydawnictwa
@@ -43,6 +43,13 @@ Możesz także zainstalować wtyczkę pobierając ją samodzielnie i wgrywając 
 Trzecią opcją jest wgranie folderu z wtyczką przez FTP do katalogu `/wp-content/plugins/`.
 
 == Changelog ==
+
+= 0.71 =
+* uaktualnienie formatu linków do nowego programu partnerskiego
+
+= 0.70 =
+* możliwość wyświetlania więcej niż jednej okładki
+* możliwość ustawiania sposobu wyświetlania okładek
 
 = 0.63 =
 * możliwość ustawienia pokazywania tylko produktów darmowych
