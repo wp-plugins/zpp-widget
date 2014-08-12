@@ -29,7 +29,7 @@
 
 define("ZPP_DEBUG", false);
 
-$zpp_widget_version = '0.71';
+$zpp_widget_version = '0.72';
 
 /* Add our function to the widgets_init hook. */
 add_action( 'widgets_init', 'zpp_load_widget' );
@@ -392,23 +392,26 @@ class Zpp_Widget extends WP_Widget {
 			$ret_arr = Array();
 			$offers = $loaded_xml->Body->loadOffers->offers;
 
-			foreach( $offers->offer as $offer ) {
-				foreach( $offer->attributes->attribute as $attr ) {
-					if( !strcmp( $attr->name, 'zm:productTypeId' ) ) {
-						if( $attr->value < 32 ) {
-							if( !$only_free ) { 
-								$ret_arr[] = (int) $offer->id;
+			if(is_array($offers->offer)) {
+				foreach( $offers->offer as $offer ) {
+					foreach( $offer->attributes->attribute as $attr ) {
+						if( !strcmp( $attr->name, 'zm:productTypeId' ) ) {
+							if( $attr->value < 32 ) {
+								if( !$only_free ) { 
+									$ret_arr[] = (int) $offer->id;
+								}
+								elseif ($offer->price == 0) {
+									$ret_arr[] = (int) $offer->id;
+								}
 							}
-							elseif ($offer->price == 0) {
-								$ret_arr[] = (int) $offer->id;
-							}
+	
+							break;
 						}
-
-						break;
 					}
-				}
-
-
+				}	
+			}
+			else {
+				return null;
 			}
 		} else {
 			return null;

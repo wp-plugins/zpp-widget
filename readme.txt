@@ -44,6 +44,9 @@ Trzecią opcją jest wgranie folderu z wtyczką przez FTP do katalogu `/wp-conte
 
 == Changelog ==
 
+= 0.72 =
+* obsługa błędu, gdy nie ma produktów w danej kategorii
+
 = 0.71 =
 * uaktualnienie formatu linków do nowego programu partnerskiego
 
