@@ -4,7 +4,7 @@
 	Plugin URI: http://pp.zlotemysli.pl/widget
 	Description: Widget losujący okładki dla Złotego Programu Partnerskiego - http://pp.zlotemysli.pl/
 	Author: Marcin Kądziołka
-	Version: 0.71
+	Version: 0.72
 	Author URI: http://marcin.kadziolka.net/
 	License: GPL2
 
